@@ -1,0 +1,1075 @@
+:root {
+  --Nutmeg: hsl(14, 45%, 36%);
+  --DarkRaspberry: hsl(332, 51%, 32%);
+  --White: hsl(0, 0%, 100%);
+  --RoseWhite: hsl(330, 100%, 98%);
+  --Eggshell: hsl(30, 54%, 90%);
+  --LightGrey: hsl(30, 18%, 87%);
+  --WengeBrown: hsl(30, 10%, 34%);
+  --DarkCharcoal: hsl(24, 5%, 18%);
+}
+
+/* Box sizing rules */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Prevent font size inflation */
+html {
+  -moz-text-size-adjust: none;
+  -webkit-text-size-adjust: none;
+  text-size-adjust: none;
+}
+
+/* Smooth scroll */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Remove default margin in favour of better control in authored CSS */
+body,
+h1,
+h2,
+h3,
+h4,
+p,
+figure,
+blockquote,
+dl,
+dd {
+  margin-block-end: 0;
+}
+
+/* Remove list styles on ul, ol elements with a list role, which suggests default styling will be removed */
+ul[role="li"],
+ol[role="li"] {
+  list-style: none;
+}
+/*
+
+## 🤔 Why `role` at all? We already have `list-style`
+
+Because **they solve different problems**.
+
+### 1️⃣ `list-style` = visual only
+
+```css
+ul {
+  list-style: none;
+}
+```
+
+This only does one thing:
+➡️ **Removes bullets**
+
+It does **NOT**:
+
+* change semantics
+* affect screen readers
+* express intent
+
+A screen reader still says:
+
+> “List with 5 items”
+
+---
+
+### 2️⃣ `role` = intent + accessibility
+
+```html
+<ul role="list">
+```
+
+This says:
+
+> “Yes, this is still a list, but I am *intentionally* controlling its presentation.”
+
+`role` exists to **communicate meaning**, not style.
+
+---
+
+## 🧠 So why combine them?
+
+```css
+ul[role="list"] {
+  list-style: none;
+}
+```
+
+This pattern means:
+
+> “Only remove bullets when the developer **explicitly marks** the list as layout-only.”
+
+---
+
+## 🚫 Why NOT just do this?
+
+```css
+ul {
+  list-style: none;
+}
+```
+
+Because it:
+
+* breaks content lists
+* removes visual hierarchy
+* hurts readability
+* surprises future developers
+
+---
+
+## 🧩 The real reason (important)
+
+### `role` is about **safety and intent**
+
+In large apps:
+
+* You don’t know which `ul` is content
+* You don’t know which is layout
+* Global CSS can break things silently
+
+So this rule:
+
+```css
+ul[role="list"]
+```
+
+forces **opt-in styling**.
+
+---
+
+## ⚠️ Important truth (don’t miss this)
+
+> **You do NOT need `role="list"` for accessibility.**
+
+`<ul>` already has that role implicitly.
+
+The role is used here to:
+✔ express intent
+✔ protect content
+✔ avoid global breakage
+
+---
+
+## 🏆 Final comparison
+
+| Question                   | Answer           |
+| -------------------------- | ---------------- |
+| Why not just `list-style`? | It’s too broad   |
+| Why use `role`?            | To opt in safely |
+| Is it required?            | ❌ No             |
+| Is it helpful in resets?   | ✅ Yes            |
+
+---
+
+### TL;DR (one line)
+
+> **`list-style` removes bullets everywhere.
+> `role="list"` lets you remove bullets only where you *mean to*.**
+
+That’s it.
+
+*/
+
+/* Set core body defaults */
+body {
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+* {
+  margin: 0;
+}
+
+/* Set shorter line heights on headings and interactive elements */
+h1,
+h2,
+h3,
+h4,
+button,
+input,
+label {
+  line-height: 1.1;
+}
+
+/* Balance text wrapping on headings */
+h1,
+h2,
+h3,
+h4 {
+  text-wrap: balance;
+}
+
+/* A elements that don't have a class get default styles */
+a:not([class]) {
+  text-decoration-skip-ink: auto;
+  color: currentColor;
+}
+
+/* Make images easier to work with */
+img,
+picture {
+  max-width: 100%;
+  display: block;
+}
+
+/* Inherit fonts for inputs and buttons */
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+/* Make sure textareas without a rows attribute are not tiny */
+textarea:not([rows]) {
+  min-height: 10em;
+}
+
+/* Anything that has been anchored to should have extra scroll margin */
+:target {
+  scroll-margin-block: 5ex;
+}
+/*
+This CSS is used to **control where the browser stops scrolling** when a page jumps to an anchor (hash link).
+
+---
+
+## 🔍 Breakdown
+
+```css
+:target {
+  scroll-margin-block: 5ex;
+}
+```
+
+### 1️⃣ `:target`
+
+* A **pseudo-class** that matches the element whose `id` equals the URL hash.
+* Example:
+
+  ```html
+  <a href="#section2">Go</a>
+  <div id="section2">...</div>
+  ```
+
+  When clicked, `#section2` becomes the `:target`.
+
+---
+
+### 2️⃣ `scroll-margin-block: 5ex`
+
+* Adds **extra space in the block direction** (top & bottom in most writing modes) when scrolling to that element.
+* `5ex` ≈ height of **5 lowercase “x” characters** in the current font.
+
+📌 **Effect**
+When the browser scrolls to a target element, it stops **5ex before** the element instead of aligning it flush to the top.
+
+---
+
+## 🧠 Why this is useful
+
+### Common problem
+
+Anchors hidden behind fixed headers:
+
+```css
+header {
+  position: fixed;
+  top: 0;
+  height: 60px;
+}
+```
+
+Clicking an anchor often hides the heading under the header.
+
+### Solution
+
+```css
+:target {
+  scroll-margin-block: 5ex;
+}
+```
+
+✔ Ensures the target element is **visible below the fixed header**
+
+---
+
+## 🧪 Visual Example
+
+Without it:
+
+```
+[HEADER]
+[Target heading]  ← hidden
+```
+
+With it:
+
+```
+[HEADER]
+
+[Target heading]  ← visible
+```
+
+---
+
+## 🧩 Related properties
+
+| Property                    | Use                         |
+| --------------------------- | --------------------------- |
+| `scroll-margin-top`         | Only top spacing            |
+| `scroll-margin-block-start` | Logical top                 |
+| `scroll-padding-top`        | Applies to scroll container |
+
+---
+
+## ✅ TL;DR
+
+* `:target` → element jumped to via `#hash`
+* `scroll-margin-block: 5ex` → adds breathing space when scrolling
+* Mainly used to **prevent anchor links from hiding content**
+
+If you want, I can show:
+
+* when to use `scroll-margin` vs `scroll-padding`
+* best values for fixed headers
+* browser support nuances
+
+*/
+body {
+  background: var(--Eggshell);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wrapper {
+  max-width: 46rem;
+  padding-inline: 0;
+  padding-block: 0 1.75rem;
+  background: var(--White);
+  border-radius: 1.5rem;
+}
+/*
+This is using **CSS logical padding properties**. Here’s exactly what it does.
+
+---
+
+## 🔍 The CSS
+
+```css
+padding-inline: 0;
+padding-block: 0 1.75rem;
+```
+
+---
+
+## 1️⃣ `padding-inline: 0;`
+
+* Applies padding on the **inline axis** (left & right in LTR languages).
+* `0` means **no horizontal padding**.
+
+Equivalent (for LTR layouts):
+
+```css
+padding-left: 0;
+padding-right: 0;
+```
+
+---
+
+## 2️⃣ `padding-block: 0 1.75rem;`
+
+* Applies padding on the **block axis** (top & bottom).
+* Two values = **start and end** of the block direction.
+
+```css
+padding-block: <start> <end>;
+```
+
+So this means:
+
+* `padding-top: 0`
+* `padding-bottom: 1.75rem`
+
+Equivalent (for horizontal writing mode):
+
+```css
+padding-top: 0;
+padding-bottom: 1.75rem;
+```
+
+---
+
+## 🧠 Why use logical properties?
+
+They adapt automatically to:
+
+* RTL languages (Arabic, Hebrew)
+* Vertical writing modes (Japanese, Chinese)
+
+No need to rewrite CSS for different layouts.
+
+---
+
+## ✅ TL;DR
+
+| Property                   | Meaning                   |
+| -------------------------- | ------------------------- |
+| `padding-inline: 0`        | left & right = 0          |
+| `padding-block: 0 1.75rem` | top = 0, bottom = 1.75rem |
+*/
+
+.text-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2.5rem;
+  padding-inline-start: 2.5rem;
+  padding-inline-end: 2.5rem;
+  margin-block-start: 2.5rem;
+}
+/*
+A **logical property** in CSS is a property that **follows the document’s writing direction and flow**, instead of hard-coding physical directions like `top`, `left`, `right`, and `bottom`.
+
+---
+
+## 🧠 The core idea
+
+### ❌ Physical properties
+
+```css
+margin-left: 16px;
+padding-top: 8px;
+```
+
+These assume:
+
+* Left → Right text
+* Top → Bottom layout
+
+They **break or feel wrong** in:
+
+* RTL languages (Arabic, Hebrew)
+* Vertical writing modes (Japanese)
+
+---
+
+### ✅ Logical properties
+
+```css
+margin-inline-start: 16px;
+padding-block-start: 8px;
+```
+
+These adapt automatically based on:
+
+* Writing direction (`ltr` / `rtl`)
+* Writing mode (`horizontal-tb`, `vertical-rl`, etc.)
+
+---
+
+## 📐 The two logical axes
+
+### 1️⃣ Inline axis (text direction)
+
+* LTR → left → right
+* RTL → right → left
+
+Logical properties:
+
+* `*-inline-start`
+* `*-inline-end`
+* `*-inline`
+
+---
+
+### 2️⃣ Block axis (line stacking direction)
+
+* Usually top → bottom
+* Can be vertical in some scripts
+
+Logical properties:
+
+* `*-block-start`
+* `*-block-end`
+* `*-block`
+
+---
+
+## 🧩 Mapping example (common case)
+
+| Logical                | LTR (English)  | RTL (Arabic)   |
+| ---------------------- | -------------- | -------------- |
+| `padding-inline-start` | padding-left   | padding-right  |
+| `padding-inline-end`   | padding-right  | padding-left   |
+| `padding-block-start`  | padding-top    | padding-top    |
+| `padding-block-end`    | padding-bottom | padding-bottom |
+
+---
+
+## 🔧 Common logical properties
+
+### Spacing
+
+```css
+margin-inline
+margin-block
+padding-inline
+padding-block
+```
+
+### Borders
+
+```css
+border-inline
+border-block
+border-inline-start
+border-block-end
+```
+
+### Size & position
+
+```css
+inline-size   
+block-size    
+inset-inline  
+inset-block   
+```
+
+---
+
+## 🌍 Why they matter (real-world)
+
+* Internationalization (i18n)
+* RTL support **without duplicate CSS**
+* Vertical text layouts
+* Cleaner, future-proof styles
+
+---
+
+## 🧪 Example
+
+```css
+.card {
+  padding-inline: 1rem;
+  padding-block: 0.5rem;
+}
+```
+
+Works correctly in:
+
+* English (LTR)
+* Arabic (RTL)
+* Vertical writing modes
+
+No changes needed ✅
+
+---
+
+## ✅ TL;DR
+
+> **Logical properties describe layout relative to text flow, not screen edges.**
+
+If you remember one thing:
+
+* **Inline = text direction**
+* **Block = line direction**
+
+If you want, I can show:
+
+* how `writing-mode` changes behavior
+* logical vs physical shorthand comparisons
+* browser support & gotchas
+
+*/
+
+.title {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.main-heading {
+  font-family: "Young Serif";
+  font-weight: 400;
+  font-size: clamp(2.25rem, 5vw, 2.5rem);
+  line-height: 100%;
+  color: var(--DarkCharcoal);
+}
+
+.paragraph {
+  font-family: "Outfit";
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 150%;
+  color: var(--WengeBrown);
+}
+
+.preparation {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 1.5rem;
+  gap: 1rem;
+  width: 100%;
+  background: var(--RoseWhite);
+  border-radius: 0.75rem;
+}
+
+.ter-heading {
+  font-family: "Outfit";
+  font-weight: 600;
+  font-size: 1.25rem;
+  line-height: 100%;
+  color: var(--DarkRaspberry);
+}
+
+.preparation-list,
+.ingredients-list,
+.instructions-list {
+  padding-left: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.preparation-list li::marker {
+  font-weight: 700;
+  color: var(--DarkRaspberry);
+}
+
+.preparation-list .paragraph,
+.ingredients-list .paragraph,
+.instructions-list .paragraph {
+  padding-left: 1rem;
+}
+
+.ingredients-list li::marker,
+.instructions-list li::marker {
+  font-weight: 700;
+  color: var(--Nutmeg);
+}
+
+.instructions::before {
+  content: "";
+  width: 100%;
+  height: 1px;
+  background-color: var(--LightGrey);
+  display: inline-block;
+  margin-bottom: 1.875rem;
+}
+
+.instructions::after {
+  content: "";
+  width: 100%;
+  height: 1px;
+  background-color: var(--LightGrey);
+  display: inline-block;
+  margin-top: 2.5rem;
+}
+
+.p-bold {
+  font-weight: 700;
+}
+
+.qty {
+  color: var(--Nutmeg);
+}
+
+.sec-heading {
+  font-family: "Young Serif";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 1.75rem;
+  line-height: 100%;
+  color: var(--Nutmeg);
+  margin-bottom: 1.5rem;
+}
+
+table {
+  width: 100%;
+  margin-block-start: 0.75rem;
+  border-collapse: collapse;
+}
+
+td {
+  padding-inline-start: 2rem;
+}
+
+tr:not(:last-child) {
+  border-bottom: 1px solid var(--LightGrey);
+}
+
+td {
+  padding-block-end: 0.75rem;
+  padding-block-start: 0.75rem;
+}
+
+@media screen and (min-width: 37.5rem) {
+  body {
+    padding: 2rem 1rem;
+  }
+
+  .wrapper {
+    padding-inline: 2.5rem;
+    padding-block: 1.75rem;
+  }
+
+  .hero-img {
+    border-radius: 1.5rem;
+  }
+
+  .text-content {
+    padding-inline-start: 0;
+    padding-inline-end: 0;
+  }
+}
+
+/*
+
+## 📦 1. Global `box-sizing`
+
+```css
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+```
+
+### What it does
+
+* Applies `border-box` to **all elements and pseudo-elements**
+* Width and height now include **padding + border**
+
+### Why it’s good
+
+* Prevents unexpected layout overflow
+* Makes sizing **predictable**
+* Industry-standard best practice
+
+---
+
+## 🔠 2. Prevent Font Size Inflation
+
+```css
+html {
+  -moz-text-size-adjust: none;
+  -webkit-text-size-adjust: none;
+  text-size-adjust: none;
+  box-sizing: border-box;
+}
+```
+
+### What it does
+
+* Stops browsers (especially mobile) from **auto-scaling text**
+* Ensures font sizes remain **consistent across devices**
+
+### Why it’s good
+
+* Prevents unexpected text resizing
+* Gives designers **full control** over typography
+
+---
+
+## 🌀 3. Smooth Scrolling (Motion-Aware)
+
+```css
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+```
+
+### What it does
+
+* Enables **smooth scrolling**
+* Respects users who prefer **reduced motion**
+
+### Why it’s good
+
+* Improves UX without harming accessibility
+* Follows **WCAG accessibility guidelines**
+
+---
+
+## 📏 4. Remove Default Margins (Logical)
+
+```css
+body,
+h1,
+h2,
+h3,
+h4,
+p,
+figure,
+blockquote,
+dl,
+dd {
+  margin-block-end: 0;
+}
+```
+
+### What it does
+
+* Removes browser default **bottom margins**
+* Uses **logical properties** (`margin-block-end`)
+
+### Why it’s good
+
+* Consistent spacing control
+* Better support for different writing modes
+* Avoids “mystery gaps”
+
+---
+
+## 📋 5. Remove List Styles (Role-Based)
+
+```css
+ul[role="list"],
+ol[role="list"] {
+  list-style: none;
+}
+```
+
+### What it does
+
+* Removes bullets/numbers **only when explicitly intended**
+* Keeps semantic meaning intact
+
+### Why it’s good
+
+* Accessible reset pattern
+* Avoids breaking normal lists unintentionally
+
+---
+
+## 🧍 6. Core Body Defaults
+
+```css
+body {
+  min-height: 100vh;
+  line-height: 1.5;
+}
+```
+
+### What it does
+
+* Ensures body fills the viewport
+* Sets a **readable default line-height**
+
+### Why it’s good
+
+* Better typography
+* Supports full-height layouts
+* Improves text legibility
+
+---
+
+## 🧹 7. Remove Default Page Spacing
+
+```css
+html,
+body {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+* {
+  margin: 0;
+}
+```
+
+### What it does
+
+* Fully removes browser default spacing
+
+### Why it’s good
+
+* Clean slate for layout
+* Prevents inconsistent browser defaults
+
+---
+
+## 🔠 8. Tighter Line Height for Headings & Controls
+
+```css
+h1,
+h2,
+h3,
+h4,
+button,
+input,
+label {
+  line-height: 1.1;
+}
+```
+
+### What it does
+
+* Reduces vertical spacing for headings and form elements
+
+### Why it’s good
+
+* Improves visual hierarchy
+* Prevents overly tall headings
+* Makes UI elements more compact
+
+---
+
+## ⚖️ 9. Balanced Text Wrapping (Modern CSS)
+
+```css
+h1,
+h2,
+h3,
+h4 {
+  text-wrap: balance;
+}
+```
+
+### What it does
+
+* Balances line breaks in headings
+* Avoids awkward single-word lines
+
+### Why it’s good
+
+* Cleaner typography
+* Especially useful for large headings
+* Modern, progressive enhancement
+
+---
+
+## 🔗 10. Default Link Styling (Unclassed Only)
+
+```css
+a:not([class]) {
+  text-decoration-skip-ink: auto;
+  color: currentColor;
+}
+```
+
+### What it does
+
+* Improves underline readability
+* Makes links inherit text color
+* Applies only to links **without custom styling**
+
+### Why it’s good
+
+* Accessible by default
+* Doesn’t override intentional link designs
+
+---
+
+## 🖼️ 11. Image Defaults
+
+```css
+img,
+picture {
+  max-width: 100%;
+  display: block;
+}
+```
+
+### What it does
+
+* Prevents images from overflowing containers
+* Removes inline image spacing issues
+
+### Why it’s good
+
+* Essential for responsive layouts
+* Cleaner image behavior
+
+---
+
+## ⌨️ 12. Inherit Fonts for Form Elements
+
+```css
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+```
+
+### What it does
+
+* Makes form elements use the same font as surrounding text
+
+### Why it’s good
+
+* Consistent typography
+* Removes ugly default system fonts
+
+---
+
+## 📝 13. Minimum Textarea Height
+
+```css
+textarea:not([rows]) {
+  min-height: 10em;
+}
+```
+
+### What it does
+
+* Prevents textareas from being too small by default
+
+### Why it’s good
+
+* Better usability
+* More comfortable text input
+
+---
+
+## 🎯 14. Anchor Scroll Margin
+
+```css
+:target {
+  scroll-margin-block: 5ex;
+}
+```
+
+### What it does
+
+* Adds spacing when navigating to anchors (`#id`)
+* Prevents content from hiding under fixed headers
+
+### Why it’s good
+
+* Better in-page navigation
+* Essential for docs and long pages
+
+---
+
+### TL;DR
+
+> **A clean, modern CSS reset that respects accessibility, removes browser inconsistencies, and gives you full control over layout and typography.**
+
+If you want next, I can:
+
+* Explain **why this reset is better than normalize.css**
+* Create a **minimal vs full reset comparison**
+* Convert this into a **starter `base.css` file**
+*/
